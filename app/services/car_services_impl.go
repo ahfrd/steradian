@@ -1,11 +1,16 @@
 package services
 
 import (
+	"encoding/base64"
 	"fmt"
+	"io/ioutil"
+	"log"
 	"net/http"
 	"steradian/app/models/requests"
 	"steradian/app/models/responses"
 	"steradian/app/repository"
+	"steradian/helpers"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -22,13 +27,29 @@ func NewCarServicesImpl(carRepository *repository.CarRepository) CarService {
 
 func (cs *carServicesImpl) CreateCar(ctx *gin.Context, request *requests.CreateCarRequests) responses.GenericResponse {
 	var resData responses.GenericResponse
-	insertCar := cs.CarRepository.CreateCar(ctx, request)
-	if insertCar != nil {
+	lastInsertID, err := cs.CarRepository.CreateCar(ctx, request)
+	if err != nil {
 		resData.Code = http.StatusBadRequest
-		resData.Message = fmt.Sprintf("maaf anda tidak bisa membuat data : %s", insertCar.Error())
+		resData.Message = fmt.Sprintf("maaf anda tidak bisa membuat data : %s", err.Error())
 		resData.Status = "error insert car "
 		return resData
 	}
+	linkToB64, err := helpers.LinkToBase64(request.ImageCar)
+	if err != nil {
+		resData.Code = http.StatusBadRequest
+		resData.Message = fmt.Sprintf("maaf ada kesalahan : %s", err.Error())
+		resData.Status = "error insert car "
+		return resData
+	}
+	imgName := helpers.Base64ToImage(linkToB64, lastInsertID)
+	updateRequest := &requests.UpdateCarByCarIdRequest{
+		CarName:   request.CarName,
+		CarId:     strconv.Itoa(lastInsertID),
+		DayRate:   request.DayRate,
+		MonthRate: request.MonthRate,
+		ImageCar:  imgName,
+	}
+	_ = cs.CarRepository.UpdateCarByCarId(ctx, updateRequest)
 	resData.Code = http.StatusOK
 	resData.Message = "succses insert"
 	resData.Status = "sucses"
@@ -43,6 +64,30 @@ func (cs *carServicesImpl) GetListCar(ctx *gin.Context) responses.GenericRespons
 		resData.Message = fmt.Sprintf("maaf anda gagal mendapatkan data mobil : %s", err.Error())
 		resData.Status = "failed get data"
 		return resData
+	}
+	for i, item := range selectListDataCar {
+		bytes, err := ioutil.ReadFile(item.ImageChar)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		var base64Encoding string
+
+		// Determine the content type of the image file
+		mimeType := http.DetectContentType(bytes)
+
+		// Prepend the appropriate URI scheme header depending
+		// on the MIME type
+		switch mimeType {
+		case "image/jpeg":
+			base64Encoding += "data:image/jpeg;base64,"
+		case "image/png":
+			base64Encoding += "data:image/png;base64,"
+		case "image/gif":
+			base64Encoding += "data:image/gif;base64,"
+		}
+		base64Encoding += base64.StdEncoding.EncodeToString(bytes)
+		selectListDataCar[i].ImageChar = base64Encoding
 	}
 	resData.Code = http.StatusOK
 	resData.Message = "sucses get data"
@@ -59,6 +104,30 @@ func (cs *carServicesImpl) GetDetailCar(ctx *gin.Context, request *requests.GetD
 		resData.Status = "failed get data"
 		return resData
 	}
+	bytes, err := ioutil.ReadFile(getDetail.ImageChar)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	var base64Encoding string
+
+	// Determine the content type of the image file
+	mimeType := http.DetectContentType(bytes)
+
+	// Prepend the appropriate URI scheme header depending
+	// on the MIME type
+	switch mimeType {
+	case "image/jpeg":
+		base64Encoding += "data:image/jpeg;base64,"
+	case "image/png":
+		base64Encoding += "data:image/png;base64,"
+	case "image/gif":
+		base64Encoding += "data:image/gif;base64,"
+	}
+	base64Encoding += base64.StdEncoding.EncodeToString(bytes)
+
+	getDetail.ImageChar = base64Encoding
+
 	resData.Code = http.StatusOK
 	resData.Message = "sucses get data"
 	resData.Status = "sucses"

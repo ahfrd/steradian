@@ -6,6 +6,7 @@ import (
 	"steradian/app/models/requests"
 	"steradian/app/models/responses"
 	"steradian/app/repository"
+	"steradian/helpers"
 
 	"github.com/gin-gonic/gin"
 )
@@ -22,6 +23,10 @@ func NewOrdersServicesImpl(ordersRepository *repository.OrdersRepository) Orders
 
 func (cs *OrdersServicesImpl) CreateOrders(ctx *gin.Context, request *requests.CreateOrdersRequests) responses.GenericResponse {
 	var resData responses.GenericResponse
+	request.DropoffDate = helpers.FormatDateString(request.DropoffDate)
+	request.PickupDate = helpers.FormatDateString(request.PickupDate)
+	request.OrderDate = helpers.FormatDateString(request.OrderDate)
+
 	insertOrders := cs.OrdersRepository.CreateOrders(ctx, request)
 	if insertOrders != nil {
 		resData.Code = http.StatusBadRequest
@@ -69,6 +74,9 @@ func (cs *OrdersServicesImpl) GetDetailOrders(ctx *gin.Context, request *request
 func (cs *OrdersServicesImpl) UpdateOrdersByOrdersId(ctx *gin.Context, request *requests.UpdateOrdersByOrdersIdRequest) responses.GenericResponse {
 
 	var resData responses.GenericResponse
+	request.DropoffDate = helpers.FormatDateString(request.DropoffDate)
+	request.PickupDate = helpers.FormatDateString(request.PickupDate)
+	request.OrderDate = helpers.FormatDateString(request.OrderDate)
 	err := cs.OrdersRepository.UpdateOrdersByOrdersId(ctx, request)
 	if err != nil {
 		resData.Code = http.StatusBadRequest

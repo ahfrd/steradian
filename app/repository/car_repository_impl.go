@@ -19,12 +19,14 @@ func NewCarRepositoryImpl(db *sql.DB) CarRepository {
 	}
 }
 
-func (cr *carRepositoryImpl) CreateCar(ctx *gin.Context, request *requests.CreateCarRequests) error {
+func (cr *carRepositoryImpl) CreateCar(ctx *gin.Context, request *requests.CreateCarRequests) (int, error) {
 	q := `insert into car(car_name,day_rate,month_rate,image_car) values (?,?,?,?)`
-	if _, err := cr.db.ExecContext(ctx, q, request.CarName, request.DayRate, request.MonthRate, request.ImageCar); err != nil {
-		return err
+	result, err := cr.db.ExecContext(ctx, q, request.CarName, request.DayRate, request.MonthRate, request.ImageCar)
+	if err != nil {
+		return 0, err
 	}
-	return nil
+	lastInsertId, _ := result.LastInsertId()
+	return int(lastInsertId), nil
 }
 
 func (cr *carRepositoryImpl) SelectListDataCar(ctx *gin.Context) ([]responses.SelectListDataCarResponses, error) {
