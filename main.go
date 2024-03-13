@@ -26,7 +26,7 @@ func main() {
 	carRepository := repository.NewCarRepositoryImpl(initDb)
 	ordersRepository := repository.NewOrdersRepositoryImpl(initDb)
 
-	carService := services.NewCarServicesImpl(&carRepository)
+	carService := services.NewCarServiceImpl(&carRepository)
 	ordersService := services.NewOrdersServicesImpl(&ordersRepository)
 
 	carControllers := controllers.NewCarController(&carService)

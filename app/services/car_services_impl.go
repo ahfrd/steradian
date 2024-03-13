@@ -15,17 +15,17 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type carServicesImpl struct {
+type CarServiceImpl struct {
 	CarRepository repository.CarRepository
 }
 
-func NewCarServicesImpl(carRepository *repository.CarRepository) CarService {
-	return &carServicesImpl{
+func NewCarServiceImpl(carRepository *repository.CarRepository) CarService {
+	return &CarServiceImpl{
 		CarRepository: *carRepository,
 	}
 }
 
-func (cs *carServicesImpl) CreateCar(ctx *gin.Context, request *requests.CreateCarRequests) responses.GenericResponse {
+func (cs *CarServiceImpl) CreateCar(ctx *gin.Context, request *requests.CreateCarRequests) responses.GenericResponse {
 	var resData responses.GenericResponse
 	lastInsertID, err := cs.CarRepository.CreateCar(ctx, request)
 	if err != nil {
@@ -56,7 +56,7 @@ func (cs *carServicesImpl) CreateCar(ctx *gin.Context, request *requests.CreateC
 	return resData
 }
 
-func (cs *carServicesImpl) GetListCar(ctx *gin.Context) responses.GenericResponse {
+func (cs *CarServiceImpl) GetListCar(ctx *gin.Context) responses.GenericResponse {
 	var resData responses.GenericResponse
 	selectListDataCar, err := cs.CarRepository.SelectListDataCar(ctx)
 	if err != nil {
@@ -95,7 +95,7 @@ func (cs *carServicesImpl) GetListCar(ctx *gin.Context) responses.GenericRespons
 	resData.Data = selectListDataCar
 	return resData
 }
-func (cs *carServicesImpl) GetDetailCar(ctx *gin.Context, request *requests.GetDetailCarRequest) responses.GenericResponse {
+func (cs *CarServiceImpl) GetDetailCar(ctx *gin.Context, request *requests.GetDetailCarRequest) responses.GenericResponse {
 	var resData responses.GenericResponse
 	getDetail, err := cs.CarRepository.SelectDataCarById(ctx, request.CarId)
 	if err != nil {
@@ -135,7 +135,7 @@ func (cs *carServicesImpl) GetDetailCar(ctx *gin.Context, request *requests.GetD
 	return resData
 }
 
-func (cs *carServicesImpl) UpdateCarByCarId(ctx *gin.Context, request *requests.UpdateCarByCarIdRequest) responses.GenericResponse {
+func (cs *CarServiceImpl) UpdateCarByCarId(ctx *gin.Context, request *requests.UpdateCarByCarIdRequest) responses.GenericResponse {
 
 	var resData responses.GenericResponse
 	err := cs.CarRepository.UpdateCarByCarId(ctx, request)
@@ -150,7 +150,7 @@ func (cs *carServicesImpl) UpdateCarByCarId(ctx *gin.Context, request *requests.
 	resData.Status = "sucses"
 	return resData
 }
-func (cs *carServicesImpl) DeleteCarByCarId(ctx *gin.Context, request *requests.DeleteCarRequest) responses.GenericResponse {
+func (cs *CarServiceImpl) DeleteCarByCarId(ctx *gin.Context, request *requests.DeleteCarRequest) responses.GenericResponse {
 
 	var resData responses.GenericResponse
 	err := cs.CarRepository.DeleteCarByCarId(ctx, request.CarId)

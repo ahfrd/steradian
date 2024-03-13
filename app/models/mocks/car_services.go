@@ -7,26 +7,32 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type MockOrdersRepository struct {
-	CreateOrdersfn           func(ctx *gin.Context, request *requests.CreateOrdersRequests) error
-	SelectListDataOrdersfn   func(ctx *gin.Context) ([]responses.SelectListDataOrdersResponses, error)
-	SelectDataOrdersByIdfn   func(ctx *gin.Context, ordersId string) (*responses.SelectListDataOrdersResponses, error)
-	UpdateOrdersByOrdersIdfn func(ctx *gin.Context, request *requests.UpdateOrdersByOrdersIdRequest) error
-	DeleteOrdersByOrdersIdfn func(ctx *gin.Context, ordersId string) error
+type MockCarRepository struct {
+	CreateCarfn         func(ctx *gin.Context, request *requests.CreateCarRequests) (int, error)
+	SelectListDataCarfn func(ctx *gin.Context) ([]responses.SelectListDataCarResponses, error)
+	SelectDataCarByIdfn func(ctx *gin.Context, carId string) (*responses.SelectListDataCarResponses, error)
+	UpdateCarByCarIdfn  func(ctx *gin.Context, request *requests.UpdateCarByCarIdRequest) error
+	DeleteCarByCarIdfn  func(ctx *gin.Context, carId string) error
+
+	// CreateCar(ctx *gin.Context, request *requests.CreateCarRequests) (int, error)
+	// SelectListDataCar(ctx *gin.Context) ([]responses.SelectListDataCarResponses, error)
+	// SelectDataCarById(ctx *gin.Context, carId string) (*responses.SelectListDataCarResponses, error)
+	// UpdateCarByCarId(ctx *gin.Context, request *requests.UpdateCarByCarIdRequest) error
+	// DeleteCarByCarId(ctx *gin.Context, carId string) error
 }
 
-func (mR *MockOrdersRepository) CreateOrders(ctx *gin.Context, request *requests.CreateOrdersRequests) error {
-	return mR.CreateOrdersfn(ctx, request)
+func (mR *MockCarRepository) CreateCar(ctx *gin.Context, request *requests.CreateCarRequests) (int, error) {
+	return mR.CreateCarfn(ctx, request)
 }
-func (mR *MockOrdersRepository) SelectListDataOrders(ctx *gin.Context) ([]responses.SelectListDataOrdersResponses, error) {
-	return mR.SelectListDataOrdersfn(ctx)
+func (mR *MockCarRepository) SelectListDataCar(ctx *gin.Context) ([]responses.SelectListDataCarResponses, error) {
+	return mR.SelectListDataCarfn(ctx)
 }
-func (mR *MockOrdersRepository) SelectDataOrdersById(ctx *gin.Context, ordersId string) (*responses.SelectListDataOrdersResponses, error) {
-	return mR.SelectDataOrdersByIdfn(ctx, ordersId)
+func (mR *MockCarRepository) SelectDataCarById(ctx *gin.Context, carId string) (*responses.SelectListDataCarResponses, error) {
+	return mR.SelectDataCarByIdfn(ctx, carId)
 }
-func (mR *MockOrdersRepository) UpdateOrdersByOrdersId(ctx *gin.Context, request *requests.UpdateOrdersByOrdersIdRequest) error {
-	return mR.UpdateOrdersByOrdersIdfn(ctx, request)
+func (mR *MockCarRepository) UpdateCarByCarId(ctx *gin.Context, request *requests.UpdateCarByCarIdRequest) error {
+	return mR.UpdateCarByCarIdfn(ctx, request)
 }
-func (mR *MockOrdersRepository) DeleteOrdersByOrders(ctx *gin.Context, ordersId string) error {
-	return mR.DeleteOrdersByOrdersIdfn(ctx, ordersId)
+func (mR *MockCarRepository) DeleteCarByCarId(ctx *gin.Context, carId string) error {
+	return mR.DeleteCarByCarIdfn(ctx, carId)
 }
